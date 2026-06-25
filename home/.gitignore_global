@@ -1,0 +1,10 @@
+# Global gitignore (symlinked to ~/.gitignore_global, set via core.excludesfile)
+.DS_Store
+*.swp
+.idea/
+.vscode/
+# Secrets that should never land in any repo
+*.pem
+*.key
+.env
+.env.*

@@ -1,0 +1,9 @@
+# Never commit secrets in cleartext. Put machine-local/secret shell config in
+# ~/.zshrc.local (gitignored, sourced by .zshrc if present). Encrypt real
+# secrets with age/sops if you want them in the repo — see README.
+home/.zshrc.local
+*.pem
+*.key
+.env
+.env.*
+.DS_Store
