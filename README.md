@@ -6,11 +6,14 @@ a fresh Mac, one to back the live config into the repo.
 ## New Mac — one-liner
 
 ```sh
-xcode-select --install   # once, gives you git + build tools (skip if already there)
-git clone https://github.com/SteveKueng/homedir.git ~/Git/homedir && ~/Git/homedir/setup.sh
+curl -fsSL https://raw.githubusercontent.com/SteveKueng/homedir/main/bootstrap.sh | bash
 ```
 
-Add `--defaults` to also apply the macOS tweaks: `~/Git/homedir/setup.sh --defaults`.
+With macOS tweaks: append `-s -- --defaults` → `… | bash -s -- --defaults`.
+
+`bootstrap.sh` ensures git is present, clones this repo to `~/Git/homedir` (or pulls
+if already there), then runs `setup.sh`. Requires the repo to be **public** so the
+raw URL is reachable without auth — that's fine here, no secrets are committed.
 
 > Clones over HTTPS (a fresh Mac has no SSH key yet). After setup, `.gitconfig`'s
 > `insteadOf` rewrite makes pushes go over SSH automatically.
