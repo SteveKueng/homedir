@@ -3,10 +3,10 @@
 My Mac setup as code. One command sets up a fresh Mac:
 
 ```sh
-curl -fsSL https://ikueng.ch/install | bash
+curl -fsSL https://www.ikueng.ch/install | bash
 ```
 
-(Opening [ikueng.ch/install](https://ikueng.ch/install) in a browser shows the same command.)
+(Opening [www.ikueng.ch/install](https://www.ikueng.ch/install) in a browser shows the same command.)
 Apple Silicon only. Asks for your password once.
 
 ## What it does
@@ -53,5 +53,5 @@ first-run-only steps.
 
 ## Shortlink
 
-`web/.htaccess` and `web/install.html` go on the ikueng.ch web server (public and internal).
+`web/.htaccess` and `web/install.html` go on the www.ikueng.ch web server (Hostpoint).
 curl gets redirected to `bootstrap.sh` on GitHub, browsers get the page.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-liner bootstrap for a fresh Mac:
-#   curl -fsSL https://ikueng.ch/install | bash
+#   curl -fsSL https://www.ikueng.ch/install | bash
 # Pass setup flags after --, e.g.:  ... | bash -s -- --no-defaults
 set -euo pipefail
 

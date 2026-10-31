@@ -1,4 +1,4 @@
-# Upload next to install.html on ikueng.ch (public + internal server).
+# Upload next to install.html on www.ikueng.ch (Hostpoint).
 # curl gets the script, browsers get the page with the command.
 RewriteEngine On
 RewriteCond %{HTTP_USER_AGENT} ^curl/ [NC]
