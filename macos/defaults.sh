@@ -50,10 +50,12 @@ fi
 # --- Screen saver + lock ------------------------------------------------------
 defaults -currentHost write com.apple.screensaver idleTime -int 900     # 15 min
 # Password 5 s after screen saver / display sleep. Not scriptable: askForPassword
-# is ignored on modern macOS and `sysadminctl -screenLock` fails (MKBDeviceSetGracePeriod -14).
+# is ignored on modern macOS; `sysadminctl -screenLock` fails (MKBDeviceSetGracePeriod -14)
+# at least while iPhone Mirroring auto-authenticates, which locks it to "immediately".
 case "$(sysadminctl -screenLock status 2>&1)" in
   *"5 seconds"*) ;;
   *) echo "    !! set \"Require password\" to 5 seconds in the Lock Screen settings (opening)"
+     echo "       greyed out = iPhone Mirroring auto-authenticate is on; \"immediately\" is fine then"
      open "x-apple.systempreferences:com.apple.Lock-Screen-Settings.extension" ;;
 esac
 
