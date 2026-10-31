@@ -49,11 +49,11 @@ fi
 
 # --- Screen saver + lock ------------------------------------------------------
 defaults -currentHost write com.apple.screensaver idleTime -int 900     # 15 min
-# Password immediately after screen saver / display sleep. The old askForPassword
+# Password 5 s after screen saver / display sleep. The old askForPassword
 # default is ignored on modern macOS; sysadminctl needs your login password.
 case "$(sysadminctl -screenLock status 2>&1)" in
-  *immediate*) ;;
-  *) sysadminctl -screenLock immediate -password - ;;
+  *"is 5 seconds"*) ;;
+  *) sysadminctl -screenLock 5 -password - ;;
 esac
 
 # --- Shortcuts: screenshots are handled by Vorssaint --------------------------
