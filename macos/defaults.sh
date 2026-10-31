@@ -40,12 +40,21 @@ defaults write NSGlobalDomain com.apple.mouse.scaling -float 3
 defaults write NSGlobalDomain com.apple.trackpad.scaling -float 3
 
 # --- Energy (minutes; 0 = never) ----------------------------------------------
-# Power adapter: display off after 90 min, Mac never sleeps, wake for network.
-sudo pmset -c displaysleep 90 sleep 0 womp 1 powernap 1 lowpowermode 0
+# Power adapter: display off after 60 min, Mac never sleeps, wake for network.
+sudo pmset -c displaysleep 60 sleep 0 womp 1 powernap 1 lowpowermode 0
 # Battery (laptops only): display off after 2 min, sleep allowed, dim, Low Power Mode.
 if pmset -g batt | grep -q InternalBattery; then
   sudo pmset -b displaysleep 2 sleep 1 powernap 1 lowpowermode 1 lessbright 1
 fi
+
+# --- Screen saver + lock ------------------------------------------------------
+defaults -currentHost write com.apple.screensaver idleTime -int 900     # 15 min
+# Password immediately after screen saver / display sleep. The old askForPassword
+# default is ignored on modern macOS; sysadminctl needs your login password.
+case "$(sysadminctl -screenLock status 2>&1)" in
+  *immediate*) ;;
+  *) sysadminctl -screenLock immediate -password - ;;
+esac
 
 # --- Shortcuts: screenshots are handled by Vorssaint --------------------------
 # 28/29 = ⌘⇧3 file/clipboard, 30/31 = ⌘⇧4 file/clipboard, 184 = ⌘⇧5
