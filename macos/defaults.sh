@@ -49,12 +49,12 @@ fi
 
 # --- Screen saver + lock ------------------------------------------------------
 defaults -currentHost write com.apple.screensaver idleTime -int 900     # 15 min
-# Password 5 s after screen saver / display sleep. The old askForPassword
-# default is ignored on modern macOS; sysadminctl needs your login password.
+# Password 5 s after screen saver / display sleep. Not scriptable: askForPassword
+# is ignored on modern macOS and `sysadminctl -screenLock` fails (MKBDeviceSetGracePeriod -14).
 case "$(sysadminctl -screenLock status 2>&1)" in
-  *"is 5 seconds"*) ;;
-  *) sysadminctl -screenLock 5 -password - \
-       || echo "    !! couldn't set lock delay — System Settings > Lock Screen" ;;
+  *"5 seconds"*) ;;
+  *) echo "    !! set \"Require password\" to 5 seconds in the Lock Screen settings (opening)"
+     open "x-apple.systempreferences:com.apple.Lock-Screen-Settings.extension" ;;
 esac
 
 # --- Shortcuts: screenshots are handled by Vorssaint --------------------------

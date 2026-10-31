@@ -47,6 +47,7 @@ first-run-only steps.
 ## Manual steps
 
 - Grant Vorssaint Accessibility and Screen Recording (setup opens the pages).
+- Lock Screen: require password after 5 seconds (setup opens the page until it's set).
 - Sign in to the App Store, then re-run setup for Xcode.
 - Log out once so keyboard shortcut changes take effect.
 - Delete SSH keys of old Macs at <https://github.com/settings/keys>.
