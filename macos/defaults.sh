@@ -39,6 +39,14 @@ defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1   
 defaults write NSGlobalDomain com.apple.mouse.scaling -float 3
 defaults write NSGlobalDomain com.apple.trackpad.scaling -float 3
 
+# --- Energy (minutes; 0 = never) ----------------------------------------------
+# Power adapter: display off after 90 min, Mac never sleeps, wake for network.
+sudo pmset -c displaysleep 90 sleep 0 womp 1 powernap 1 lowpowermode 0
+# Battery (laptops only): display off after 2 min, sleep allowed, dim slightly.
+if pmset -g batt | grep -q InternalBattery; then
+  sudo pmset -b displaysleep 2 sleep 1 powernap 1 lowpowermode 0 lessbright 1
+fi
+
 # --- Shortcuts: screenshots are handled by Vorssaint --------------------------
 # 28/29 = ⌘⇧3 file/clipboard, 30/31 = ⌘⇧4 file/clipboard, 184 = ⌘⇧5
 for id in 28 29 30 31 184; do
