@@ -53,7 +53,8 @@ defaults -currentHost write com.apple.screensaver idleTime -int 900     # 15 min
 # default is ignored on modern macOS; sysadminctl needs your login password.
 case "$(sysadminctl -screenLock status 2>&1)" in
   *"is 5 seconds"*) ;;
-  *) sysadminctl -screenLock 5 -password - ;;
+  *) sysadminctl -screenLock 5 -password - \
+       || echo "    !! couldn't set lock delay — System Settings > Lock Screen" ;;
 esac
 
 # --- Shortcuts: screenshots are handled by Vorssaint --------------------------
