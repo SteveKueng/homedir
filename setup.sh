@@ -178,9 +178,23 @@ if once permissions; then
 fi
 
 echo
-echo "==> SSH keys on your GitHub account (delete old Macs at github.com/settings/keys):"
+echo "==> Other SSH keys on your GitHub account (old Macs?):"
 # Not `gh ssh-key list`: it also queries signing keys, which needs an extra scope.
-gh api user/keys --jq '.[] | "    \(.title)\t\(.created_at[:10])"'
+# Public key is base64 (no quotes), safe to inline; gh's --jq takes no --arg.
+OTHERS="$(gh api user/keys --jq ".[] | select(.key != \"$(cut -d' ' -f1,2 "$KEY.pub")\")
+  | \"\(.id)\t\(.title)\t\(.created_at[:10])\"")"
+if [ -z "$OTHERS" ]; then
+  echo "    none"
+else
+  cut -f2- <<<"$OTHERS"
+  read -rp "Delete some of them? [y/N] " answer
+  if [[ "$answer" == [yY]* ]]; then
+    while IFS=$'\t' read -r id title created; do
+      read -rp "    delete \"$title\" ($created)? [y/N] " answer </dev/tty
+      [[ "$answer" == [yY]* ]] && gh ssh-key delete "$id" --yes
+    done <<<"$OTHERS"
+  fi
+fi
 
 echo
 echo "==> Done. A restart is needed for keyboard shortcuts and some defaults."
