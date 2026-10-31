@@ -10,6 +10,7 @@ ICLOUD="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
 PRIV="$ICLOUD/homedir"
 STATE="$HOME/.config/homedir"     # markers for one-time steps
 VORSSAINT=/Applications/Vorssaint.app/Contents/MacOS/Vorssaint
+export GH_PAGER=cat               # no `less` popping up mid-setup
 
 NO_DEFAULTS=0 FORCE=0
 for a in "$@"; do
