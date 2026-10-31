@@ -146,10 +146,12 @@ fdesetup isactive >/dev/null || echo "    !! FileVault is OFF — turn it on in 
 
 if once dock; then
   echo "==> Dock"
-  dockutil --remove all --no-restart >/dev/null || true
+  # Via `defaults` (cfprefsd), not dockutil: editing the plist file directly gets
+  # overwritten by cfprefsd's cached copy right after defaults.sh touched the Dock.
+  defaults write com.apple.dock persistent-apps -array
   for app in \
-    /Applications/Safari.app \
     "/Applications/Microsoft Edge.app" \
+    /Applications/Safari.app \
     /System/Applications/Mail.app \
     /System/Applications/Calendar.app \
     /System/Applications/Notes.app \
@@ -157,7 +159,10 @@ if once dock; then
     "/Applications/Visual Studio Code.app" \
     /Applications/Claude.app \
     "/System/Applications/System Settings.app"; do
-    if [ -e "$app" ]; then dockutil --add "$app" --no-restart >/dev/null; fi
+    [ -e "$app" ] || continue
+    app="$(realpath "$app")"   # Safari is a symlink into a Cryptex
+    defaults write com.apple.dock persistent-apps -array-add \
+      "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>$app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
   done
   killall Dock
   touch "$STATE/dock"
@@ -173,9 +178,13 @@ fi
 
 echo
 echo "==> SSH keys on your GitHub account (delete old Macs at github.com/settings/keys):"
-gh ssh-key list
+# Not `gh ssh-key list`: it also queries signing keys, which needs an extra scope.
+gh api user/keys --jq '.[] | "    \(.title)\t\(.created_at[:10])"'
 
-cat <<'EOF'
-
-==> Done. Open a new terminal. Log out once so keyboard shortcuts take effect.
-EOF
+echo
+echo "==> Done. A restart is needed for keyboard shortcuts and some defaults."
+read -rp "Restart now? [y/N] " answer
+case "$answer" in
+  [yY]*) sudo shutdown -r now ;;
+  *) echo "    Restart later. Open a new terminal meanwhile." ;;
+esac

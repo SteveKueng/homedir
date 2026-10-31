@@ -3,7 +3,6 @@
 
 # Tools used by setup.sh
 brew "gh"
-brew "dockutil"
 brew "mas"
 
 # Apps
