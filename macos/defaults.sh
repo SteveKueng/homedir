@@ -1,18 +1,51 @@
 #!/usr/bin/env bash
-# Optional macOS tweaks. Run via: ./setup.sh --defaults
-# Add your own `defaults write` lines as you discover them (backup.sh does NOT
-# capture these automatically — macOS has no clean "dump my settings").
+# macOS defaults. Run by setup.sh (skip with --no-defaults). Idempotent.
+# Add a `defaults write` line here when you change a setting you want on every Mac.
 set -euo pipefail
+echo "==> macOS defaults"
 
-# Show hidden files in Finder
+# --- Finder -------------------------------------------------------------------
 defaults write com.apple.finder AppleShowAllFiles -bool true
-# Show file extensions
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-# Don't write .DS_Store on network/USB volumes
+defaults write com.apple.finder ShowPathbar -bool true
+defaults write com.apple.finder ShowStatusBar -bool true
+defaults write com.apple.finder FXPreferredViewStyle -string Nlsv        # list view
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+defaults write com.apple.finder FXDefaultSearchScope -string SCcf        # search current folder
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+defaults write com.apple.finder NewWindowTarget -string PfHm             # new window = home
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-# Faster key repeat
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# --- Dock (apps are set once by setup.sh) -------------------------------------
+defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock tilesize -int 49
+defaults write com.apple.dock show-recents -bool false
+defaults write com.apple.dock mru-spaces -bool false
+
+# --- Keyboard -----------------------------------------------------------------
 defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+defaults write NSGlobalDomain AppleKeyboardUIMode -int 2                 # Tab moves through all controls
 
-killall Finder 2>/dev/null || true
-echo "==> macOS defaults applied (some need logout/restart)."
+# --- Trackpad / mouse ---------------------------------------------------------
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1   # login screen
+defaults write NSGlobalDomain com.apple.mouse.scaling -float 3
+defaults write NSGlobalDomain com.apple.trackpad.scaling -float 3
+
+# --- Shortcuts: screenshots are handled by Vorssaint --------------------------
+# 28/29 = ⌘⇧3 file/clipboard, 30/31 = ⌘⇧4 file/clipboard, 184 = ⌘⇧5
+for id in 28 29 30 31 184; do
+  defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+    -dict-add "$id" "<dict><key>enabled</key><false/></dict>"
+done
+# ponytail: undocumented; reliable fallback is logging out once
+/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
+
+killall Finder Dock SystemUIServer 2>/dev/null || true

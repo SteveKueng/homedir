@@ -1,60 +1,57 @@
-# homedir — machine as code
+# homedir
 
-My Mac setup as code: dotfiles, Homebrew, Claude Code config. One script to set up
-a fresh Mac, one to back the live config into the repo.
-
-## New Mac — one-liner
+My Mac setup as code. One command sets up a fresh Mac:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/SteveKueng/homedir/main/bootstrap.sh | bash
+curl -fsSL https://ikueng.ch/install | bash
 ```
 
-With macOS tweaks: append `-s -- --defaults` → `… | bash -s -- --defaults`.
+(Opening [ikueng.ch/install](https://ikueng.ch/install) in a browser shows the same command.)
+Apple Silicon only. Asks for your password once.
 
-`bootstrap.sh` ensures git is present, clones this repo to `~/Git/homedir` (or pulls
-if already there), then runs `setup.sh`. Requires the repo to be **public** so the
-raw URL is reachable without auth — that's fine here, no secrets are committed.
+## What it does
 
-> Clones over HTTPS (a fresh Mac has no SSH key yet). After setup, `.gitconfig`'s
-> `insteadOf` rewrite makes pushes go over SSH automatically.
+`bootstrap.sh` installs the Xcode Command Line Tools if needed, clones this repo to
+`~/Git/homedir`, then runs `setup.sh`, which:
 
-`setup.sh` is idempotent. It:
-1. installs Homebrew + oh-my-zsh if missing,
-2. `brew bundle` (CLI tools, casks, VSCode extensions from `Brewfile`),
-3. symlinks `home/*` dotfiles into `$HOME` (existing files → `*.pre-homedir.bak`),
-4. copies the portable `claude/settings.json` to `~/.claude/`,
-5. optionally applies `macos/defaults.sh`.
+1. asks for the computer name,
+2. waits until you're signed in to your Apple Account with iCloud Drive on,
+3. installs Homebrew, oh-my-zsh and everything in the `Brewfile`,
+4. symlinks the dotfiles in `home/` into `$HOME`,
+5. symlinks private config from iCloud Drive (`homedir/` folder): kubeconfig, Claude settings,
+6. imports Vorssaint settings from iCloud (first run only),
+7. logs in to GitHub in the browser, creates an SSH key named after the computer and uploads it,
+8. turns on Touch ID for `sudo` and the firewall, warns if FileVault is off,
+9. applies `macos/defaults.sh` (Finder, Dock, keyboard, trackpad, screenshot shortcuts off),
+10. sets up the Dock apps (first run only),
+11. opens the privacy settings for Vorssaint's permissions.
 
-Open a new terminal afterwards.
+Re-running is safe. Flags: `--no-defaults` skips macOS defaults, `--force` redoes the
+first-run-only steps.
 
-## Backup (capture current config → repo)
+## Where things live
 
-```sh
-./backup.sh        # updates Brewfile + claude settings, commits (no push)
-git push           # when you're ready
-```
+- **This repo (public):** scripts and anything that isn't secret.
+- **iCloud Drive `homedir/` (private, end-to-end encrypted with Advanced Data Protection):**
+  `kube/config`, `claude/settings.json`, `vorssaint.plist`.
+- **`~/.zshrc.local`, `~/.ssh/config.local`:** per-machine config, never committed.
 
-Dotfiles are symlinked, so editing e.g. `~/.zshrc` already changes the repo file —
-`backup.sh` mainly refreshes the `Brewfile` and re-sanitizes `claude/settings.json`
-(strips username + plugin version from the statusLine path).
+## Day to day
 
-## Manual steps (not automated)
+- **Add an app:** add a line to the `Brewfile`, run `./setup.sh`.
+- **Change a macOS setting for every Mac:** add a `defaults write` line to `macos/defaults.sh`.
+- **Changed Vorssaint settings:** run `homedir-save`.
+- **Dotfiles** are symlinks, so edits land in the repo. New terminals show
+  `homedir: N uncommitted` until you commit and push.
 
-- **App logins** — sign into apps (browsers, 1Password, etc.).
-- **App Store apps** — `mas` isn't used. Install from the App Store, or `brew install mas`,
-  add `mas "App", id: 12345` lines to the `Brewfile`, then they're covered.
-- **SSH keys** — generate (`ssh-keygen -t ed25519`) and add to GitHub. Keys are never
-  committed.
-- **`~/.zshrc.local`** — machine-local / secret shell config goes here. Gitignored,
-  auto-sourced by `.zshrc` if present.
+## Manual steps
 
-## Secrets
+- Grant Vorssaint Accessibility and Screen Recording (setup opens the pages).
+- Sign in to the App Store, then re-run setup for Xcode.
+- Log out once so keyboard shortcut changes take effect.
+- Delete SSH keys of old Macs at <https://github.com/settings/keys>.
 
-Nothing secret is committed in cleartext (`.gitignore` blocks `.env`, `*.key`, `*.pem`,
-`~/.zshrc.local`). For secrets you *do* want versioned, encrypt with `age` or `sops`
-(both already in the `Brewfile`) and commit only the ciphertext.
+## Shortlink
 
-## Portability
-
-No hardcoded `/Users/<name>` paths — dotfiles use `$HOME`, and the Claude statusLine
-path is globbed (`.../ponytail/*/hooks/...`) so username and plugin version don't matter.
+`web/.htaccess` and `web/install.html` go on the ikueng.ch web server (public and internal).
+curl gets redirected to `bootstrap.sh` on GitHub, browsers get the page.

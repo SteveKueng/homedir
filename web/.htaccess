@@ -1,0 +1,6 @@
+# Upload next to install.html on ikueng.ch (public + internal server).
+# curl gets the script, browsers get the page with the command.
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} ^curl/ [NC]
+RewriteRule ^install$ https://raw.githubusercontent.com/SteveKueng/homedir/main/bootstrap.sh [R=302,L]
+RewriteRule ^install$ install.html [L]
